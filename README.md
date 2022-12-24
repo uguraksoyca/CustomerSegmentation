@@ -36,6 +36,19 @@ In this project I used;
 
 ## As we can see, before we join order_items table with orders and customers table, we need to use group by function to sum all rows of price and freight value columns to avoid duplicate customers and orders.
 
+## 2) Create one single view
 
+SELECT c.customer_id,c.customer_state,c.customer_city,round(sum(oi.price+oi.freight_value),2) as TotalSpendbyCustomer, <br>
+round(sum(oi.price+oi.freight_value) over (),2) as TotalSales,count(o.order_id) as TotalOrdersByCustomer, <br>
+round(sum(oi.price+oi.freight_value) over () / count(oi.order_item_id) over (),2) as AvgSpendByCustomer, <br>
+count(o.order_id) over () as TotalOrders,max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) as LastOrderDateByCustomer, <br>
+max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) over () as LastOrderDate, <br>
+DATEDIFF(max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) over (),max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")))   <br>
+as DateDiffFromLastOrderByCustomer FROM  customers c  <br>
+inner join orders o on o.customer_id=c.customer_id  <br>
+inner join order_items oi on oi.order_id=o.order_id  <br>
+group by c.customer_id,c.customer_state,c.customer_city limit 10;  <br>
+
+![singleview1](https://user-images.githubusercontent.com/114496063/209449137-7b7f4e42-8e04-4ce2-9301-55574450da8f.png)
 
 
