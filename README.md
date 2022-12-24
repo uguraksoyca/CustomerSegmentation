@@ -100,19 +100,19 @@ when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.3 then 3  <
 when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.5 then 2  <br>
 else 1 end as TotalDaysDiffPoints from customerordersview c) x ;  <br>
 
-/*Total Numbers of Customers based on Segmentation  and avg spend*/  <br>
+## 3.1) Total Numbers of Customers based on Segmentation  and avg spend  <br>
 Select s.CustomerSegment,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
 group by s.CustomerSegment;  <br>
 
 ![segmentation1](https://user-images.githubusercontent.com/114496063/209449557-7710f26c-6be8-457c-81fe-9f08de453a31.png)
 
-/*Total Numbers of Customers based on Segmentation,state and avg spend*/  <br>
+## 3.2) Total Numbers of Customers based on Segmentation,state and avg spend  <br>
 Select s.CustomerSegment,s.customer_state,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
 group by s.CustomerSegment,s.customer_state;  <br>
 
 ![segmentation2](https://user-images.githubusercontent.com/114496063/209449559-a515df23-7978-4327-b7e0-1979dba6af59.png)
 
-/* States which don't have Champions*/  <br>
+## 3.3) States which don't have Champions  <br>
 select y.customer_state from (  <br>
 select distinct s.customer_state,x.customer_state as customer_state2 from segmentationview s   <br>
 left join (  <br>
