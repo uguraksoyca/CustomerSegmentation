@@ -26,10 +26,15 @@ select * from order_items limit 5;<br>
 
 ![order_items](https://user-images.githubusercontent.com/114496063/209448402-981fa596-13f3-498a-b87f-5de1be449b20.png)
 
-select oi.order_id,count(*) as OrderIDDuplicate from order_items oi group by oi.order_id having count(*)>1 limit 5;
+select oi.order_id,count(*) as OrderIDDuplicate from order_items oi group by oi.order_id having count(*)>1 order by OrderIDDuplicate desc limit 5 ;
 
-![order_itemsDuplicate](https://user-images.githubusercontent.com/114496063/209448594-22ca3eaa-3924-4c7d-8a5a-16d7be080622.png)
 
+
+## order_items table has order_ids more than 1. Let's check one of them.
+
+select * from order_items oi where oi.order_id='8272b63d03f5f79c56e9e4120aec44ef' <br>
+
+![orderitemfiltered](https://user-images.githubusercontent.com/114496063/209448837-492d1036-efc1-4640-a8e5-525d6aa9208d.png)
 
 
 
