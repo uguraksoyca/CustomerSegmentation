@@ -38,7 +38,7 @@ In this project I used;
 
 ## 2) Create one single view
 
-## 2.1) join all tables, then create new columns like total orders, total sales and TotalOrdersByCustomer. To find dates, first we need to use STR_TO_DATE function to convert text values to date.
+## 2.1) Join all tables, then create new columns like total orders, total sales and TotalOrdersByCustomer. To find dates, first we need to use STR_TO_DATE function to convert text values to date.
 
 SELECT c.customer_id,c.customer_state,c.customer_city,round(sum(oi.price+oi.freight_value),2) as TotalSpendbyCustomer, <br>
 round(sum(oi.price+oi.freight_value) over (),2) as TotalSales,count(o.order_id) as TotalOrdersByCustomer, <br>
@@ -55,7 +55,7 @@ group by c.customer_id,c.customer_state,c.customer_city limit 10;  <br>
 
 ## 2.2) Create one single view by using create view statement
 
-## creating one view to calculate total points based on total spend, total orders and difference between last order date and customer's last order date
+## Ceating one view to calculate total points based on total spend, total orders and difference between last order date and customer's last order date
 create view customerordersview as 
 select x.*,max(x.TotalOrdersByCustomer) over() as MaxOrdersByCustomer,min(x.DateDiffFromLastOrderByCustomer) over() as MinDateDiffFromLastOrder, <br>
 max(x.DateDiffFromLastOrderByCustomer) over() as MaxDateDiffFromLastOrder,avg(x.DateDiffFromLastOrderByCustomer) over() as AvgDateDiffFromLastOrder from ( <br>
@@ -74,6 +74,7 @@ group by c.customer_id,c.customer_state,c.customer_city) x; <br>
 
 ### select * from customerordersview limit 10;
 
+![singleview2](https://user-images.githubusercontent.com/114496063/209449370-97320da2-6eac-42ac-b627-c26e6c6532f3.png)
 
 
 
