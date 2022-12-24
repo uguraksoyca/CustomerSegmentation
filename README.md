@@ -21,14 +21,14 @@ In this project I used;
 ### select o.order_id,count(*) as OrderIDDuplicate from orders o group by o.order_id having count(*)>1;
 
 ![ordersDuplicate](https://user-images.githubusercontent.com/114496063/209448591-11fb6c60-9dae-4bb6-9ae8-cb63ad30b40d.png)
-## 1.1) order_items table
+## 1.3) order_items table
 ### select * from order_items limit 5;<br>
 
 ![order_items](https://user-images.githubusercontent.com/114496063/209448402-981fa596-13f3-498a-b87f-5de1be449b20.png)
 
 ### select oi.order_id,count(*) as OrderIDDuplicate from order_items oi group by oi.order_id having count(*)>1 order by OrderIDDuplicate desc limit 5 ;
 
-## order_items table has order_ids more than 1. Let's check one of them.
+## 1.3.1) order_items table has order_ids more than 1. Let's check one of them.
 
 ### select * from order_items oi where oi.order_id='8272b63d03f5f79c56e9e4120aec44ef' <br>
 
