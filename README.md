@@ -56,7 +56,7 @@ group by c.customer_id,c.customer_state,c.customer_city limit 10;  <br>
 ## 2.2) Create one single view by using create view statement
 
 ## Ceating one view to calculate total points based on total spend, total orders and difference between last order date and customer's last order date
-create view customerordersview as 
+create view customer_orders_view as 
 select x.*,max(x.TotalOrdersByCustomer) over() as MaxOrdersByCustomer,min(x.DateDiffFromLastOrderByCustomer) over() as MinDateDiffFromLastOrder, <br>
 max(x.DateDiffFromLastOrderByCustomer) over() as MaxDateDiffFromLastOrder,avg(x.DateDiffFromLastOrderByCustomer) over() as AvgDateDiffFromLastOrder from ( <br>
 SELECT c.customer_id,c.customer_state,c.customer_city,round(sum(oi.price+oi.freight_value),2) as TotalSpendbyCustomer, <br>
@@ -70,11 +70,47 @@ inner join orders o on o.customer_id=c.customer_id <br>
 inner join order_items oi on oi.order_id=o.order_id  <br>
 group by c.customer_id,c.customer_state,c.customer_city) x; <br>
 
-## 2.3) select customerordersview
+## 2.3) select customer_orders_view
 
-### select * from customerordersview limit 10;
+### select * from customer_orders_view limit 10;
 
 ![singleview2](https://user-images.githubusercontent.com/114496063/209449370-97320da2-6eac-42ac-b627-c26e6c6532f3.png)
 
+## 3) Create Segmentation
 
+create view segmentationview as   <br>
+Select x.*,x.TotalSpendPoints+x.TotalOrderPoints+x.TotalDaysDiffPoints as TotalPoints,  <br>
+case when x.TotalSpendPoints+x.TotalOrderPoints+x.TotalDaysDiffPoints >12 then "Champions"  <br> 
+when x.TotalSpendPoints+x.TotalOrderPoints+x.TotalDaysDiffPoints >8 then "Loyal customers"  <br>
+when x.TotalSpendPoints+x.TotalOrderPoints+x.TotalDaysDiffPoints >4 then "Potential Loyalists"  <br>
+else "At Risk Customers" end as CustomerSegment from (  <br>
+select c.*,case when c.TotalSpendbyCustomer>=c.AvgSpendByCustomer*2 then 5  <br>
+when c.TotalSpendbyCustomer>=c.AvgSpendByCustomer then 4  <br>
+when c.TotalSpendbyCustomer>=c.AvgSpendByCustomer*0.7 then 3  <br>
+when c.TotalSpendbyCustomer>=c.AvgSpendByCustomer*0.4 then 2  <br>
+else 1 end as TotalSpendPoints,  <br>
+case when c.totalOrdersByCustomer>=c.MaxOrdersByCustomer*0.8 then 5  <br>
+when c.totalOrdersByCustomer>=c.MaxOrdersByCustomer*0.5 then 4  <br>
+when c.totalOrdersByCustomer>=c.MaxOrdersByCustomer*0.2 then 3  <br>
+when c.totalOrdersByCustomer>=c.MaxOrdersByCustomer*0.1 then 2  <br>
+else 1 end as TotalOrderPoints,  <br>
+case when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.1 then 5  <br>
+when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.2 then 4  <br>
+when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.3 then 3  <br>
+when c.DateDiffFromLastOrderByCustomer<=c.MaxDateDiffFromLastOrder*0.5 then 2  <br>
+else 1 end as TotalDaysDiffPoints from customerordersview c) x ;  <br>
 
+/*Total Numbers of Customers based on Segmentation  and avg spend*/  <br>
+Select s.CustomerSegment,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
+group by s.CustomerSegment;  <br>
+
+/*Total Numbers of Customers based on Segmentation,state and avg spend*/  <br>
+Select s.CustomerSegment,s.customer_state,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
+group by s.CustomerSegment,s.customer_state;  <br>
+
+/* States which don't have Champions*/  <br>
+select y.customer_state from (  <br>
+select distinct s.customer_state,x.customer_state as customer_state2 from segmentationview s   <br>
+left join (  <br>
+select distinct s.customer_state from segmentationview s where s.CustomerSegment="Champions") x  <br>
+on s.customer_state=x.customer_state) y where y.customer_state2 is null;  <br>
