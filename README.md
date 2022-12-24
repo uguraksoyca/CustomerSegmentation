@@ -38,6 +38,8 @@ In this project I used;
 
 ## 2) Create one single view
 
+## 2.1) join all tables, then create new columns like total orders, total sales and TotalOrdersByCustomer. To find dates, first we need to use STR_TO_DATE function to convert text values to date.
+
 SELECT c.customer_id,c.customer_state,c.customer_city,round(sum(oi.price+oi.freight_value),2) as TotalSpendbyCustomer, <br>
 round(sum(oi.price+oi.freight_value) over (),2) as TotalSales,count(o.order_id) as TotalOrdersByCustomer, <br>
 round(sum(oi.price+oi.freight_value) over () / count(oi.order_item_id) over (),2) as AvgSpendByCustomer, <br>
@@ -50,5 +52,28 @@ inner join order_items oi on oi.order_id=o.order_id  <br>
 group by c.customer_id,c.customer_state,c.customer_city limit 10;  <br>
 
 ![singleview1](https://user-images.githubusercontent.com/114496063/209449137-7b7f4e42-8e04-4ce2-9301-55574450da8f.png)
+
+## 2.2) Create one single view by using create view statement
+
+## creating one view to calculate total points based on total spend, total orders and difference between last order date and customer's last order date
+create view customerordersview as 
+select x.*,max(x.TotalOrdersByCustomer) over() as MaxOrdersByCustomer,min(x.DateDiffFromLastOrderByCustomer) over() as MinDateDiffFromLastOrder, <br>
+max(x.DateDiffFromLastOrderByCustomer) over() as MaxDateDiffFromLastOrder,avg(x.DateDiffFromLastOrderByCustomer) over() as AvgDateDiffFromLastOrder from ( <br>
+SELECT c.customer_id,c.customer_state,c.customer_city,round(sum(oi.price+oi.freight_value),2) as TotalSpendbyCustomer, <br>
+round(sum(oi.price+oi.freight_value) over (),2) as TotalSales,count(o.order_id) as TotalOrdersByCustomer, <br>
+round(sum(oi.price+oi.freight_value) over () / count(oi.order_item_id) over (),2) as AvgSpendByCustomer, <br>
+count(o.order_id) over () as TotalOrders,max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) as LastOrderDateByCustomer, <br>
+max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) over () as LastOrderDate, <br>
+DATEDIFF(max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y")) over (), <br>
+max(STR_TO_DATE(o.order_purchase_timestamp, "%m/%d/%Y"))) as DateDiffFromLastOrderByCustomer  FROM  customers c <br>
+inner join orders o on o.customer_id=c.customer_id <br>
+inner join order_items oi on oi.order_id=o.order_id  <br>
+group by c.customer_id,c.customer_state,c.customer_city) x; <br>
+
+## 2.3) select customerordersview
+
+### select * from customerordersview limit 10;
+
+
 
 
