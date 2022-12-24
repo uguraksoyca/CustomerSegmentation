@@ -34,7 +34,7 @@ In this project I used;
 
 ![orderitemfiltered](https://user-images.githubusercontent.com/114496063/209448837-492d1036-efc1-4640-a8e5-525d6aa9208d.png)
 
-
+## As we can see, before we join order_items table with orders and customers table, we need to use group by function to sum all rows of price and freight value columns to avoid duplicate customers and orders.
 
 
 
