@@ -104,9 +104,13 @@ else 1 end as TotalDaysDiffPoints from customerordersview c) x ;  <br>
 Select s.CustomerSegment,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
 group by s.CustomerSegment;  <br>
 
+![segmentation1](https://user-images.githubusercontent.com/114496063/209449557-7710f26c-6be8-457c-81fe-9f08de453a31.png)
+
 /*Total Numbers of Customers based on Segmentation,state and avg spend*/  <br>
 Select s.CustomerSegment,s.customer_state,count(*) as TotalCustomerNumbers,round(avg(s.totalSpendByCustomer),2) as totalSpend from segmentationview s  <br>
 group by s.CustomerSegment,s.customer_state;  <br>
+
+![segmentation2](https://user-images.githubusercontent.com/114496063/209449559-a515df23-7978-4327-b7e0-1979dba6af59.png)
 
 /* States which don't have Champions*/  <br>
 select y.customer_state from (  <br>
@@ -114,3 +118,5 @@ select distinct s.customer_state,x.customer_state as customer_state2 from segmen
 left join (  <br>
 select distinct s.customer_state from segmentationview s where s.CustomerSegment="Champions") x  <br>
 on s.customer_state=x.customer_state) y where y.customer_state2 is null;  <br>
+
+![segmentation3](https://user-images.githubusercontent.com/114496063/209449562-d9d9bec3-e977-412a-8813-320d7e1f9cf2.png)
